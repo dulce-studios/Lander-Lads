@@ -11,6 +11,7 @@ USpaceshipStaticMeshComponent::USpaceshipStaticMeshComponent()
 {
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(
 		TEXT("StaticMesh'/Game/Meshes/USSShippington.USSShippington'"));
+
 	this->SetStaticMesh(MeshAsset.Object);
 
 	this->SpringArm = this->CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -27,5 +28,4 @@ USpaceshipStaticMeshComponent::USpaceshipStaticMeshComponent()
 	FTransform CameraTransform(FRotator(-20, 0, 0), FVector(0, 0, 300), FVector(1));
 	Camera->SetRelativeTransform(CameraTransform);
 	Camera->AttachToComponent(this->SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
-
 }
