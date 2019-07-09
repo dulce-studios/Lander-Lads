@@ -25,7 +25,7 @@ protected:
 
 	// Used for handling inputs
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-	
+
 	// Axis bindings
 	void MoveForwardBackward(float AxisValue);
 	void MoveLeftRight(float AxisValue);
@@ -35,14 +35,11 @@ protected:
 
 	// Action bindings
 	void MoveUpButtonPressed();
-
-	UFUNCTION()
-	void OnCompHit(
-		UPrimitiveComponent* HitComp, 
-		AActor* OtherActor, 
-		UPrimitiveComponent* OtherComp, 
-		FVector NormalImpulse, 
-		const FHitResult& Hit);
+	void MoveDownButtonPressed();
+	void MoveRightButtonPressed();
+	void MoveLeftButtonPressed();
+	void MoveForwardButtonPressed();
+	void MoveBackwardButtonPressed();
 
 	// Getters
 	USpaceshipStaticMeshComponent* GetSpaceshipStaticMeshComponent();
@@ -52,6 +49,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	UFUNCTION()
+	void OnCompHit(
+		UPrimitiveComponent* HitComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse,
+		const FHitResult& Hit);
+
 	const float ClampAxisValue(float AxisValue);
 
 	UCurveFloat* CurveFloat;
@@ -59,9 +64,12 @@ private:
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
 	USpaceshipStaticMeshComponent* SpaceshipStaticMeshComponent;
 
-	float ShipThrustStartTime;
+	float UpThrustStartTime;
+	float DownThrustStartTime;
+	float RightThrustStartTime;
+	float LeftThrustStartTime;
+	float ForwardThrustStartTime;
+	float BackwardThrustStartTime;
 
-	FVector ForwardBackwardForceVector;
-	FVector UpDownForceVector;
-	FVector LeftRightForceVector;
+	FVector ResultantForceVector;
 };
