@@ -22,8 +22,6 @@ ASpaceshipPawn::ASpaceshipPawn()
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveAsset(
 		TEXT("CurveFloat'/Game/Misc/ThrusterJerk.ThrusterJerk'"));
 	this->CurveFloat = CurveAsset.Object;
-
-
 }
 
 // Called when the game starts or when spawned
@@ -32,7 +30,6 @@ void ASpaceshipPawn::BeginPlay()
 	Super::BeginPlay();
 	
 	this->SpaceshipStaticMeshComponent->OnComponentHit.AddDynamic(this, &ASpaceshipPawn::OnCompHit);
-
 }
 
 // Called every frame
@@ -57,6 +54,13 @@ void ASpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("MoveForwardButtonPressed", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveForwardButtonPressed);
 	PlayerInputComponent->BindAction("MoveBackwardButtonPressed", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveBackwardButtonPressed);
 
+	PlayerInputComponent->BindAction("MoveUpButtonReleased", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveUpButtonReleased);
+	PlayerInputComponent->BindAction("MoveDownButtonReleased", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveDownButtonReleased);
+	PlayerInputComponent->BindAction("MoveRightButtonReleased", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveRightButtonReleased);
+	PlayerInputComponent->BindAction("MoveLeftButtonReleased", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveLeftButtonReleased);
+	PlayerInputComponent->BindAction("MoveForwardButtonReleased", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveForwardButtonReleased);
+	PlayerInputComponent->BindAction("MoveBackwardButtonReleased", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveBackwardButtonReleased);
+
 	PlayerInputComponent->BindAxis("ForwardBackward", this, &ASpaceshipPawn::MoveForwardBackward);
 	PlayerInputComponent->BindAxis("LeftRight", this, &ASpaceshipPawn::MoveLeftRight);
 	PlayerInputComponent->BindAxis("UpDown", this, &ASpaceshipPawn::MoveUpDown);
@@ -65,64 +69,107 @@ void ASpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 }
 
 void ASpaceshipPawn::MoveUpButtonPressed()
+{	
+	this->UpThrustStartTime = this->GetWorld()->GetRealTimeSeconds();
+}
+
+void ASpaceshipPawn::MoveUpButtonReleased()
 {
-	UWorld* World = this->GetWorld();
-	if (World) {
-		this->UpThrustStartTime = World->GetRealTimeSeconds();
-	}
+	this->UpThrustStartTime = 0.0f;
 }
 
 void ASpaceshipPawn::MoveDownButtonPressed()
 {
+	this->DownThrustStartTime = this->GetWorld()->GetRealTimeSeconds();
+}
 
+void ASpaceshipPawn::MoveDownButtonReleased()
+{
+	this->DownThrustStartTime = 0.0f;
 }
 
 void ASpaceshipPawn::MoveRightButtonPressed()
 {
+	this->UpThrustStartTime = this->GetWorld()->GetRealTimeSeconds();
+}
 
+void ASpaceshipPawn::MoveRightButtonReleased()
+{
+	this->UpThrustStartTime = 0.0f;
 }
 
 void ASpaceshipPawn::MoveLeftButtonPressed()
 {
+	this->LeftThrustStartTime = this->GetWorld()->GetRealTimeSeconds();
+}
 
+void ASpaceshipPawn::MoveLeftButtonReleased()
+{
+	this->LeftThrustStartTime = 0.0f;
 }
 
 void ASpaceshipPawn::MoveForwardButtonPressed()
 {
+	this->ForwardThrustStartTime = this->GetWorld()->GetRealTimeSeconds();
+}
 
+void ASpaceshipPawn::MoveForwardButtonReleased()
+{
+	this->ForwardThrustStartTime = 0.0f;
 }
 
 void ASpaceshipPawn::MoveBackwardButtonPressed()
 {
-
+	this->BackwardThrustStartTime = this->GetWorld()->GetRealTimeSeconds();
 }
+
+void ASpaceshipPawn::MoveBackwardButtonReleased()
+{
+	this->BackwardThrustStartTime = 0.0f;
+}
+
 
 void ASpaceshipPawn::MoveForwardBackward(float AxisValue)
 {
-	UWorld* World = this->GetWorld();
-	if (World) {
-		const float ClampedAxisValue = ClampAxisValue(AxisValue);
-		const float ForwardBackwardVectorMagnitude = ClampedAxisValue * 4000;
-		this->ResultantForceVector.SetComponentForAxis(EAxis::X, ForwardBackwardVectorMagnitude);
-	}
+	constexpr float RelativeXThrust = 490 * 4000;
+	const float ClampedAxisValue = ClampAxisValue(AxisValue);
+
+	const float TimeDifference = ClampedAxisValue > 0.0f ?
+		(this->GetWorld()->GetRealTimeSeconds() - this->ForwardThrustStartTime) :
+		(this->GetWorld()->GetRealTimeSeconds() - this->BackwardThrustStartTime);
+	
+	const float Curvey = this->CurveFloat->GetFloatValue(TimeDifference);
+	const float ForwardBackwardVectorMagnitude = RelativeXThrust * ClampedAxisValue * Curvey;
+	this->ResultantForceVector.SetComponentForAxis(EAxis::X, ForwardBackwardVectorMagnitude);
 }
 
 void ASpaceshipPawn::MoveLeftRight(float AxisValue)
 {
+	constexpr float RelativeYThrust = 490 * 4000;
+	const float ClampedAxisValue = ClampAxisValue(AxisValue);
 
+	const float TimeDifference = ClampedAxisValue > 0.0f ?
+		(this->GetWorld()->GetRealTimeSeconds() - this->RightThrustStartTime) :
+		(this->GetWorld()->GetRealTimeSeconds() - this->LeftThrustStartTime);
+
+	const float Curvey = this->CurveFloat->GetFloatValue(TimeDifference);
+	const float ForwardBackwardVectorMagnitude = RelativeYThrust * ClampedAxisValue * Curvey;
+	this->ResultantForceVector.SetComponentForAxis(EAxis::Y, ForwardBackwardVectorMagnitude);
 }
 
 void ASpaceshipPawn::MoveUpDown(float AxisValue)
 {
-	UWorld* World = this->GetWorld();
-	if (World) {
-		const float CounterGravity = World->GetGravityZ() * -1;
-		const float ClampedAxisValue = ClampAxisValue(AxisValue);
-		const float TimeDifference = World->GetRealTimeSeconds() - this->UpThrustStartTime;
-		const float Curvey = this->CurveFloat->GetFloatValue(TimeDifference);
-		const float UpDownForceVectorMagnitude = CounterGravity * 4000 * ClampedAxisValue * Curvey;
-		this->ResultantForceVector.SetComponentForAxis(EAxis::Z, UpDownForceVectorMagnitude);
-	}
+	const float Lift = this->GetWorld()->GetGravityZ() * -1 * 4000;
+	const float ClampedAxisValue = ClampAxisValue(AxisValue);
+
+	const float TimeDifference = ClampedAxisValue > 0.0f ? 
+		(this->GetWorld()->GetRealTimeSeconds() - this->UpThrustStartTime) : 
+		(this->GetWorld()->GetRealTimeSeconds() - this->DownThrustStartTime);
+
+	const float Curvey = this->CurveFloat->GetFloatValue(TimeDifference);
+	const float UpDownForceVectorMagnitude = Lift * ClampedAxisValue * Curvey;
+	this->ResultantForceVector.SetComponentForAxis(EAxis::Z, UpDownForceVectorMagnitude);
+	
 }
 
 void ASpaceshipPawn::MoveCameraLookHorizontal(float AxisValue)
