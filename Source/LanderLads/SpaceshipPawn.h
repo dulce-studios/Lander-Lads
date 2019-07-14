@@ -40,7 +40,12 @@ protected:
 	void MoveLeftButtonPressed();
 	void MoveForwardButtonPressed();
 	void MoveBackwardButtonPressed();
-
+	void MoveUpButtonReleased();
+	void MoveDownButtonReleased();
+	void MoveRightButtonReleased();
+	void MoveLeftButtonReleased();
+	void MoveForwardButtonReleased();
+	void MoveBackwardButtonReleased();
 	// Getters
 	USpaceshipStaticMeshComponent* GetSpaceshipStaticMeshComponent();
 
