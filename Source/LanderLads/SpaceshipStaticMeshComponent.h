@@ -18,12 +18,16 @@ public:
 	USpaceshipStaticMeshComponent();
 
 	UParticleSystemComponent* GetExplosionParticleSystemComponent();
+	UParticleSystemComponent* GetBumThrusterParticleSystemComponent();
 
 private:
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	UPROPERTY()
 	USpringArmComponent* SpringArm;
 
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	UPROPERTY()
 	UParticleSystemComponent* ExplosionParticleSystemComponent;
+
+	UPROPERTY()
+	UParticleSystemComponent* BumThrusterParticleSystemComponent;
 
 };
