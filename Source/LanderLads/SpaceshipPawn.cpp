@@ -48,19 +48,19 @@ void ASpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	check(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction("MoveUpButtonPressed", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveUpButtonPressed);
-	PlayerInputComponent->BindAction("MoveDownButtonPressed", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveDownButtonPressed);
-	PlayerInputComponent->BindAction("MoveRightButtonPressed", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveRightButtonPressed);
-	PlayerInputComponent->BindAction("MoveLeftButtonPressed", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveLeftButtonPressed);
-	PlayerInputComponent->BindAction("MoveForwardButtonPressed", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveForwardButtonPressed);
-	PlayerInputComponent->BindAction("MoveBackwardButtonPressed", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveBackwardButtonPressed);
+	PlayerInputComponent->BindAction("MoveUp", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveUpButtonPressed);
+	PlayerInputComponent->BindAction("MoveDown", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveDownButtonPressed);
+	PlayerInputComponent->BindAction("MoveRight", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveRightButtonPressed);
+	PlayerInputComponent->BindAction("MoveLeft", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveLeftButtonPressed);
+	PlayerInputComponent->BindAction("MoveForward", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveForwardButtonPressed);
+	PlayerInputComponent->BindAction("MoveBackward", EInputEvent::IE_Pressed, this, &ASpaceshipPawn::MoveBackwardButtonPressed);
 
-	PlayerInputComponent->BindAction("MoveUpButtonReleased", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveUpButtonReleased);
-	PlayerInputComponent->BindAction("MoveDownButtonReleased", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveDownButtonReleased);
-	PlayerInputComponent->BindAction("MoveRightButtonReleased", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveRightButtonReleased);
-	PlayerInputComponent->BindAction("MoveLeftButtonReleased", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveLeftButtonReleased);
-	PlayerInputComponent->BindAction("MoveForwardButtonReleased", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveForwardButtonReleased);
-	PlayerInputComponent->BindAction("MoveBackwardButtonReleased", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveBackwardButtonReleased);
+	PlayerInputComponent->BindAction("MoveUp", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveUpButtonReleased);
+	PlayerInputComponent->BindAction("MoveDown", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveDownButtonReleased);
+	PlayerInputComponent->BindAction("MoveRight", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveRightButtonReleased);
+	PlayerInputComponent->BindAction("MoveLeft", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveLeftButtonReleased);
+	PlayerInputComponent->BindAction("MoveForward", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveForwardButtonReleased);
+	PlayerInputComponent->BindAction("MoveBackward", EInputEvent::IE_Released, this, &ASpaceshipPawn::MoveBackwardButtonReleased);
 
 	PlayerInputComponent->BindAxis("ForwardBackward", this, &ASpaceshipPawn::MoveForwardBackward);
 	PlayerInputComponent->BindAxis("LeftRight", this, &ASpaceshipPawn::MoveLeftRight);
@@ -72,11 +72,14 @@ void ASpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ASpaceshipPawn::MoveUpButtonPressed()
 {	
 	this->UpThrustStartTime = this->GetWorld()->GetRealTimeSeconds();
+	this->GetSpaceshipStaticMeshComponent()->GetBumThrusterParticleSystemComponent()->SetActive(true);
 }
 
 void ASpaceshipPawn::MoveUpButtonReleased()
 {
+	UE_LOG(LogTemp, Warning, TEXT("REEEELEASED"));
 	this->UpThrustStartTime = 0.0f;
+	this->GetSpaceshipStaticMeshComponent()->GetBumThrusterParticleSystemComponent()->SetActive(false);
 }
 
 void ASpaceshipPawn::MoveDownButtonPressed()
