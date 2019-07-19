@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/StaticMeshComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 #include "SpaceshipStaticMeshComponent.generated.h"
@@ -16,9 +17,13 @@ class LANDERLADS_API USpaceshipStaticMeshComponent : public UStaticMeshComponent
 public:
 	USpaceshipStaticMeshComponent();
 
+	UParticleSystemComponent* GetExplosionParticleSystemComponent();
+
 private:
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
 	USpringArmComponent* SpringArm;
 
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	UParticleSystemComponent* ExplosionParticleSystemComponent;
 
 };
