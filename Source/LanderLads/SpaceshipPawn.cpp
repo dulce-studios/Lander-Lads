@@ -28,7 +28,8 @@ ASpaceshipPawn::ASpaceshipPawn()
 void ASpaceshipPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	this->SpaceshipStaticMeshComponent->SetNotifyRigidBodyCollision(true);
 	this->SpaceshipStaticMeshComponent->OnComponentHit.AddDynamic(this, &ASpaceshipPawn::OnCompHit);
 }
 
@@ -37,7 +38,7 @@ void ASpaceshipPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	this->GetSpaceshipStaticMeshComponent()->AddForce(ResultantForceVector);
+	this->GetSpaceshipStaticMeshComponent()-> AddForce(ResultantForceVector);
 }
 
 // Called to bind functionality to input
@@ -203,8 +204,20 @@ void ASpaceshipPawn::OnCompHit(
 	FVector NormalImpulse,
 	const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Warning, TEXT("SOMEEEBUDY"));
 	if (HitComp == this->GetSpaceshipStaticMeshComponent()) {
-		UE_LOG(LogTemp, Warning, TEXT("WE ARE HIT!!"));
+		constexpr float ForceThreshold = 300000;
+		if (NormalImpulse.X > ForceThreshold ||
+			NormalImpulse.Y > ForceThreshold ||
+			NormalImpulse.Z > ForceThreshold) {
+			this->ExplodeShip();
+		}
 	}
+}
+
+void ASpaceshipPawn::ExplodeShip()
+{
+	this->GetSpaceshipStaticMeshComponent()->GetExplosionParticleSystemComponent()->SetRelativeScale3D(FVector(15));
+	this->GetSpaceshipStaticMeshComponent()->SetVisibility(false);
+	this->GetSpaceshipStaticMeshComponent()->SetSimulatePhysics(false);
+	this->GetSpaceshipStaticMeshComponent()->GetExplosionParticleSystemComponent()->SetActive(true);
 }

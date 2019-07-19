@@ -46,14 +46,14 @@ protected:
 	void MoveLeftButtonReleased();
 	void MoveForwardButtonReleased();
 	void MoveBackwardButtonReleased();
+
 	// Getters
 	USpaceshipStaticMeshComponent* GetSpaceshipStaticMeshComponent();
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-private:
+	
 	UFUNCTION()
 	void OnCompHit(
 		UPrimitiveComponent* HitComp,
@@ -62,6 +62,7 @@ private:
 		FVector NormalImpulse,
 		const FHitResult& Hit);
 
+private:
 	const float ClampAxisValue(float AxisValue);
 
 	UCurveFloat* CurveFloat;
@@ -77,4 +78,6 @@ private:
 	float BackwardThrustStartTime;
 
 	FVector ResultantForceVector;
+
+	void ExplodeShip();
 };
