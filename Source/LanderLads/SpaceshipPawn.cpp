@@ -38,7 +38,7 @@ void ASpaceshipPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	this->GetSpaceshipStaticMeshComponent()-> AddForce(ResultantForceVector);
+	this->SpaceshipStaticMeshComponent-> AddForce(ResultantForceVector);
 }
 
 // Called to bind functionality to input
@@ -72,14 +72,13 @@ void ASpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ASpaceshipPawn::MoveUpButtonPressed()
 {	
 	this->UpThrustStartTime = this->GetWorld()->GetRealTimeSeconds();
-	this->GetSpaceshipStaticMeshComponent()->GetBumThrusterParticleSystemComponent()->SetActive(true);
+	this->SpaceshipStaticMeshComponent->GetBumThrusterParticleSystemComponent()->SetActive(true);
 }
 
 void ASpaceshipPawn::MoveUpButtonReleased()
 {
-	UE_LOG(LogTemp, Warning, TEXT("REEEELEASED"));
 	this->UpThrustStartTime = 0.0f;
-	this->GetSpaceshipStaticMeshComponent()->GetBumThrusterParticleSystemComponent()->SetActive(false);
+	this->SpaceshipStaticMeshComponent->GetBumThrusterParticleSystemComponent()->SetActive(false);
 }
 
 void ASpaceshipPawn::MoveDownButtonPressed()
@@ -135,45 +134,57 @@ void ASpaceshipPawn::MoveBackwardButtonReleased()
 
 void ASpaceshipPawn::MoveForwardBackward(float AxisValue)
 {
-	constexpr float RelativeXThrust = 490 * 4000;
-	const float ClampedAxisValue = ClampAxisValue(AxisValue);
-
-	const float TimeDifference = ClampedAxisValue > 0.0f ?
-		(this->GetWorld()->GetRealTimeSeconds() - this->ForwardThrustStartTime) :
-		(this->GetWorld()->GetRealTimeSeconds() - this->BackwardThrustStartTime);
-	
-	const float Curvey = this->CurveFloat->GetFloatValue(TimeDifference);
-	const float ForwardBackwardVectorMagnitude = RelativeXThrust * ClampedAxisValue * Curvey;
-	this->ResultantForceVector.SetComponentForAxis(EAxis::X, ForwardBackwardVectorMagnitude);
+	this->HandleAxisBindings(EAxis::X, AxisValue);
 }
 
 void ASpaceshipPawn::MoveLeftRight(float AxisValue)
 {
-	constexpr float RelativeYThrust = 490 * 4000;
-	const float ClampedAxisValue = ClampAxisValue(AxisValue);
-
-	const float TimeDifference = ClampedAxisValue > 0.0f ?
-		(this->GetWorld()->GetRealTimeSeconds() - this->RightThrustStartTime) :
-		(this->GetWorld()->GetRealTimeSeconds() - this->LeftThrustStartTime);
-
-	const float Curvey = this->CurveFloat->GetFloatValue(TimeDifference);
-	const float ForwardBackwardVectorMagnitude = RelativeYThrust * ClampedAxisValue * Curvey;
-	this->ResultantForceVector.SetComponentForAxis(EAxis::Y, ForwardBackwardVectorMagnitude);
+	this->HandleAxisBindings(EAxis::Y, AxisValue);
 }
 
 void ASpaceshipPawn::MoveUpDown(float AxisValue)
 {
-	const float Lift = this->GetWorld()->GetGravityZ() * -1 * 4000;
-	const float ClampedAxisValue = ClampAxisValue(AxisValue);
+	this->HandleAxisBindings(EAxis::Z, AxisValue);
+	
+}
 
-	const float TimeDifference = ClampedAxisValue > 0.0f ? 
-		(this->GetWorld()->GetRealTimeSeconds() - this->UpThrustStartTime) : 
-		(this->GetWorld()->GetRealTimeSeconds() - this->DownThrustStartTime);
+void ASpaceshipPawn::HandleAxisBindings(EAxis::Type Axis, float AxisValue)
+{
+	const float ClampedAxisValue = this->ClampAxisValue(AxisValue);
+
+	float Thrust;
+	float TimeDifference;
+
+	switch (Axis)
+	{
+	case EAxis::X:
+		TimeDifference = ClampedAxisValue > 0.0f ?
+			(this->GetWorld()->GetRealTimeSeconds() - this->ForwardThrustStartTime) :
+			(this->GetWorld()->GetRealTimeSeconds() - this->BackwardThrustStartTime);
+		Thrust = 490 * 4000;
+		break;
+	case EAxis::Y:
+		TimeDifference = ClampedAxisValue > 0.0f ?
+			(this->GetWorld()->GetRealTimeSeconds() - this->RightThrustStartTime) :
+			(this->GetWorld()->GetRealTimeSeconds() - this->LeftThrustStartTime);
+		Thrust = 490 * 4000;
+		break;
+	case EAxis::Z:
+		TimeDifference = ClampedAxisValue > 0.0f ?
+			(this->GetWorld()->GetRealTimeSeconds() - this->UpThrustStartTime) :
+			(this->GetWorld()->GetRealTimeSeconds() - this->DownThrustStartTime);
+		Thrust = this->GetWorld()->GetGravityZ() * -1 * 4000;
+		break;
+	default:
+		TimeDifference = 0.0f;
+		Thrust = 0.0f;
+	}
 
 	const float Curvey = this->CurveFloat->GetFloatValue(TimeDifference);
-	const float UpDownForceVectorMagnitude = Lift * ClampedAxisValue * Curvey;
-	this->ResultantForceVector.SetComponentForAxis(EAxis::Z, UpDownForceVectorMagnitude);
-	
+	float ForceVectorMagnitude = Thrust * ClampedAxisValue * Curvey;
+	UE_LOG(LogTemp, Warning, TEXT("WHEEE %f"), ForceVectorMagnitude);
+	this->ResultantForceVector.SetComponentForAxis(Axis, ForceVectorMagnitude);
+
 }
 
 void ASpaceshipPawn::MoveCameraLookHorizontal(float AxisValue)
@@ -192,12 +203,9 @@ void ASpaceshipPawn::MoveCameraLookVertical(float AxisValue)
 
 const float ASpaceshipPawn::ClampAxisValue(float AxisValue)
 {
-	return FMath::Clamp(AxisValue, -1.0f, 1.0f);
-}
-
-USpaceshipStaticMeshComponent* ASpaceshipPawn::GetSpaceshipStaticMeshComponent()
-{
-	return this->SpaceshipStaticMeshComponent;
+	constexpr float LowerClampBounds = -1.0f;
+	constexpr float UpperClampBounds = 1.0f;
+	return FMath::Clamp(AxisValue, LowerClampBounds, UpperClampBounds);
 }
 
 void ASpaceshipPawn::OnCompHit(
@@ -207,7 +215,7 @@ void ASpaceshipPawn::OnCompHit(
 	FVector NormalImpulse,
 	const FHitResult& Hit)
 {
-	if (HitComp == this->GetSpaceshipStaticMeshComponent()) {
+	if (HitComp == this->SpaceshipStaticMeshComponent) {
 		constexpr float ForceThreshold = 300000;
 		if (NormalImpulse.X > ForceThreshold ||
 			NormalImpulse.Y > ForceThreshold ||
@@ -219,8 +227,8 @@ void ASpaceshipPawn::OnCompHit(
 
 void ASpaceshipPawn::ExplodeShip()
 {
-	this->GetSpaceshipStaticMeshComponent()->GetExplosionParticleSystemComponent()->SetRelativeScale3D(FVector(15));
-	this->GetSpaceshipStaticMeshComponent()->SetVisibility(false);
-	this->GetSpaceshipStaticMeshComponent()->SetSimulatePhysics(false);
-	this->GetSpaceshipStaticMeshComponent()->GetExplosionParticleSystemComponent()->SetActive(true);
+	this->SpaceshipStaticMeshComponent->GetExplosionParticleSystemComponent()->SetRelativeScale3D(FVector(15));
+	this->SpaceshipStaticMeshComponent->SetVisibility(false);
+	this->SpaceshipStaticMeshComponent->SetSimulatePhysics(false);
+	this->SpaceshipStaticMeshComponent->GetExplosionParticleSystemComponent()->SetActive(true);
 }

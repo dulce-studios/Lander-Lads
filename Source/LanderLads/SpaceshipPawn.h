@@ -30,6 +30,9 @@ protected:
 	void MoveForwardBackward(float AxisValue);
 	void MoveLeftRight(float AxisValue);
 	void MoveUpDown(float AxisValue);
+
+	void HandleAxisBindings(const EAxis::Type AxisType, const float AxisValue);
+
 	void MoveCameraLookHorizontal(float AxisValue);
 	void MoveCameraLookVertical(float AxisValue);
 
@@ -46,9 +49,6 @@ protected:
 	void MoveLeftButtonReleased();
 	void MoveForwardButtonReleased();
 	void MoveBackwardButtonReleased();
-
-	// Getters
-	USpaceshipStaticMeshComponent* GetSpaceshipStaticMeshComponent();
 
 public:	
 	// Called every frame
