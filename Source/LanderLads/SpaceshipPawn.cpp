@@ -182,7 +182,6 @@ void ASpaceshipPawn::HandleAxisBindings(EAxis::Type Axis, float AxisValue)
 
 	const float Curvey = this->CurveFloat->GetFloatValue(TimeDifference);
 	float ForceVectorMagnitude = Thrust * ClampedAxisValue * Curvey;
-	UE_LOG(LogTemp, Warning, TEXT("WHEEE %f"), ForceVectorMagnitude);
 	this->ResultantForceVector.SetComponentForAxis(Axis, ForceVectorMagnitude);
 
 }
