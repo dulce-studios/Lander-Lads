@@ -10,11 +10,6 @@ constexpr float TargetArmLength = 1400;
 
 USpaceshipStaticMeshComponent::USpaceshipStaticMeshComponent()
 {
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(
-		TEXT("StaticMesh'/Game/Meshes/USSShippington.USSShippington'"));
-
-	this->SetStaticMesh(MeshAsset.Object);
-
 	this->SpringArm = this->CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	this->SpringArm->TargetArmLength = TargetArmLength;
 	this->SpringArm->bInheritPitch = true;
