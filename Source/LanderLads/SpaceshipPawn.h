@@ -50,6 +50,25 @@ protected:
 	void MoveForwardButtonReleased();
 	void MoveBackwardButtonReleased();
 
+	// Ship-specific fields
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	USpaceshipStaticMeshComponent* SpaceshipStaticMeshComponent;
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	int ShipThreshold;
+	
+	/** 
+	See https://wiki.unrealengine.com/Blueprints,_Empower_Your_Entire_Team_With_BlueprintNativeEvents
+	on overriding a parent C++ function in Blueprint
+	**/
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Overridable Property")
+	void SetSpaceshipStaticMesh();
+	void SetSpaceshipStaticMesh_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Overridable Property")
+	void SetSpaceshipThreshold();
+	void SetSpaceshipThreshold_Implementation();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -66,9 +85,6 @@ private:
 	const float ClampAxisValue(float AxisValue);
 
 	UCurveFloat* CurveFloat;
-
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
-	USpaceshipStaticMeshComponent* SpaceshipStaticMeshComponent;
 
 	float UpThrustStartTime;
 	float DownThrustStartTime;

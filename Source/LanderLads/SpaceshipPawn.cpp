@@ -22,6 +22,9 @@ ASpaceshipPawn::ASpaceshipPawn()
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveAsset(
 		TEXT("CurveFloat'/Game/Misc/ThrusterJerk.ThrusterJerk'"));
 	this->CurveFloat = CurveAsset.Object;
+
+	this->SetSpaceshipStaticMesh();
+	this->SetSpaceshipThreshold();
 }
 
 // Called when the game starts or when spawned
@@ -215,10 +218,9 @@ void ASpaceshipPawn::OnCompHit(
 	const FHitResult& Hit)
 {
 	if (HitComp == this->SpaceshipStaticMeshComponent) {
-		constexpr float ForceThreshold = 300000;
-		if (NormalImpulse.X > ForceThreshold ||
-			NormalImpulse.Y > ForceThreshold ||
-			NormalImpulse.Z > ForceThreshold) {
+		if (NormalImpulse.X > this->ShipThreshold ||
+			NormalImpulse.Y > this->ShipThreshold ||
+			NormalImpulse.Z > this->ShipThreshold) {
 			this->ExplodeShip();
 		}
 	}
@@ -230,4 +232,17 @@ void ASpaceshipPawn::ExplodeShip()
 	this->SpaceshipStaticMeshComponent->SetVisibility(false);
 	this->SpaceshipStaticMeshComponent->SetSimulatePhysics(false);
 	this->SpaceshipStaticMeshComponent->GetExplosionParticleSystemComponent()->SetActive(true);
+}
+
+void ASpaceshipPawn::SetSpaceshipStaticMesh_Implementation()
+{
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(
+		TEXT("StaticMesh'/Game/Meshes/USSShippington.USSShippington'"));
+
+	this->SpaceshipStaticMeshComponent->SetStaticMesh(MeshAsset.Object);
+}
+
+void ASpaceshipPawn::SetSpaceshipThreshold_Implementation()
+{
+	this->ShipThreshold = 300000;
 }
