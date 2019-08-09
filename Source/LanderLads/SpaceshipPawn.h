@@ -51,10 +51,10 @@ protected:
 	void MoveBackwardButtonReleased();
 
 	// Ship-specific fields
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, Category="SpaceshipStaticMeshComponent", meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
 	USpaceshipStaticMeshComponent* SpaceshipStaticMeshComponent;
 
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, Category = "SpaceshipThreshold", meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
 	int ShipThreshold;
 	
 	/** 
