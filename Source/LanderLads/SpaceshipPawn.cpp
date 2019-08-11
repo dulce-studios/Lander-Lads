@@ -10,7 +10,9 @@ ASpaceshipPawn::ASpaceshipPawn()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	this->RootComponent = this->CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
+	this->RootComponent = this->CreateDefaultSubobject<USceneComponent>(
+		TEXT("RootComponent"));
+		
 	this->SpaceshipStaticMeshComponent = this->CreateDefaultSubobject<USpaceshipStaticMeshComponent>(
 		TEXT("SpaceshipStaticMeshComponent"));
 
@@ -28,7 +30,7 @@ ASpaceshipPawn::ASpaceshipPawn()
 void ASpaceshipPawn::BeginPlay()
 {
 	Super::BeginPlay();
-
+	this->SpaceshipStaticMeshComponent->SetSimulatePhysics(true);
 	this->SpaceshipStaticMeshComponent->SetNotifyRigidBodyCollision(true);
 	this->SpaceshipStaticMeshComponent->OnComponentHit.AddDynamic(this, &ASpaceshipPawn::OnCompHit);
 }
@@ -215,10 +217,9 @@ void ASpaceshipPawn::OnCompHit(
 	const FHitResult& Hit)
 {
 	if (HitComp == this->SpaceshipStaticMeshComponent) {
-		constexpr float ForceThreshold = 300000;
-		if (NormalImpulse.X > ForceThreshold ||
-			NormalImpulse.Y > ForceThreshold ||
-			NormalImpulse.Z > ForceThreshold) {
+		if (NormalImpulse.X > this->DamageThreshold ||
+			NormalImpulse.Y > this->DamageThreshold ||
+			NormalImpulse.Z > this->DamageThreshold) {
 			this->ExplodeShip();
 		}
 	}

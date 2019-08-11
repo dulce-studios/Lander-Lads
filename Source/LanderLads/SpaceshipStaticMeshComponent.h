@@ -9,7 +9,7 @@
 
 #include "SpaceshipStaticMeshComponent.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class LANDERLADS_API USpaceshipStaticMeshComponent : public UStaticMeshComponent
 {
 	GENERATED_BODY()
@@ -20,14 +20,13 @@ public:
 	UParticleSystemComponent* GetExplosionParticleSystemComponent();
 	UParticleSystemComponent* GetBumThrusterParticleSystemComponent();
 
-private:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
 	USpringArmComponent* SpringArm;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
 	UParticleSystemComponent* ExplosionParticleSystemComponent;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
 	UParticleSystemComponent* BumThrusterParticleSystemComponent;
 
 };

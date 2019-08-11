@@ -50,6 +50,13 @@ protected:
 	void MoveForwardButtonReleased();
 	void MoveBackwardButtonReleased();
 
+	// Ship-specific fields
+	UPROPERTY(EditAnywhere, Category = "SpaceshipStaticMeshComponent", meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	USpaceshipStaticMeshComponent* SpaceshipStaticMeshComponent;
+
+	UPROPERTY(EditAnywhere, Category = "DamageThreshold", meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	int DamageThreshold = 300000;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -66,9 +73,6 @@ private:
 	const float ClampAxisValue(float AxisValue);
 
 	UCurveFloat* CurveFloat;
-
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
-	USpaceshipStaticMeshComponent* SpaceshipStaticMeshComponent;
 
 	float UpThrustStartTime;
 	float DownThrustStartTime;
