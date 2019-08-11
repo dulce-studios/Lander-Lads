@@ -51,23 +51,11 @@ protected:
 	void MoveBackwardButtonReleased();
 
 	// Ship-specific fields
-	UPROPERTY(EditAnywhere, Category="SpaceshipStaticMeshComponent", meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, Category = "SpaceshipStaticMeshComponent", meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
 	USpaceshipStaticMeshComponent* SpaceshipStaticMeshComponent;
 
-	UPROPERTY(EditAnywhere, Category = "SpaceshipThreshold", meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
-	int ShipThreshold;
-	
-	/** 
-	See https://wiki.unrealengine.com/Blueprints,_Empower_Your_Entire_Team_With_BlueprintNativeEvents
-	on overriding a parent C++ function in Blueprint
-	**/
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Overridable Property")
-	void SetSpaceshipStaticMesh();
-	void SetSpaceshipStaticMesh_Implementation();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Overridable Property")
-	void SetSpaceshipThreshold();
-	void SetSpaceshipThreshold_Implementation();
+	UPROPERTY(EditAnywhere, Category = "DamageThreshold", meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	int DamageThreshold = 300000;
 
 public:	
 	// Called every frame

@@ -10,7 +10,9 @@ ASpaceshipPawn::ASpaceshipPawn()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	this->RootComponent = this->CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
+	this->RootComponent = this->CreateDefaultSubobject<USceneComponent>(
+		TEXT("RootComponent"));
+		
 	this->SpaceshipStaticMeshComponent = this->CreateDefaultSubobject<USpaceshipStaticMeshComponent>(
 		TEXT("SpaceshipStaticMeshComponent"));
 
@@ -22,16 +24,13 @@ ASpaceshipPawn::ASpaceshipPawn()
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveAsset(
 		TEXT("CurveFloat'/Game/Misc/ThrusterJerk.ThrusterJerk'"));
 	this->CurveFloat = CurveAsset.Object;
-
-	this->SetSpaceshipStaticMesh();
-	this->SetSpaceshipThreshold();
 }
 
 // Called when the game starts or when spawned
 void ASpaceshipPawn::BeginPlay()
 {
 	Super::BeginPlay();
-
+	this->SpaceshipStaticMeshComponent->SetSimulatePhysics(true);
 	this->SpaceshipStaticMeshComponent->SetNotifyRigidBodyCollision(true);
 	this->SpaceshipStaticMeshComponent->OnComponentHit.AddDynamic(this, &ASpaceshipPawn::OnCompHit);
 }
@@ -218,9 +217,9 @@ void ASpaceshipPawn::OnCompHit(
 	const FHitResult& Hit)
 {
 	if (HitComp == this->SpaceshipStaticMeshComponent) {
-		if (NormalImpulse.X > this->ShipThreshold ||
-			NormalImpulse.Y > this->ShipThreshold ||
-			NormalImpulse.Z > this->ShipThreshold) {
+		if (NormalImpulse.X > this->DamageThreshold ||
+			NormalImpulse.Y > this->DamageThreshold ||
+			NormalImpulse.Z > this->DamageThreshold) {
 			this->ExplodeShip();
 		}
 	}
@@ -232,17 +231,4 @@ void ASpaceshipPawn::ExplodeShip()
 	this->SpaceshipStaticMeshComponent->SetVisibility(false);
 	this->SpaceshipStaticMeshComponent->SetSimulatePhysics(false);
 	this->SpaceshipStaticMeshComponent->GetExplosionParticleSystemComponent()->SetActive(true);
-}
-
-void ASpaceshipPawn::SetSpaceshipStaticMesh_Implementation()
-{
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(
-		TEXT("StaticMesh'/Game/Meshes/USSShippington.USSShippington'"));
-
-	this->SpaceshipStaticMeshComponent->SetStaticMesh(MeshAsset.Object);
-}
-
-void ASpaceshipPawn::SetSpaceshipThreshold_Implementation()
-{
-	this->ShipThreshold = 300000;
 }
