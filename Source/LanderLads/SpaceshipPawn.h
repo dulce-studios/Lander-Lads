@@ -27,35 +27,25 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
 	// Axis bindings
-	void MoveForwardBackward(float AxisValue);
-	void MoveLeftRight(float AxisValue);
-	void MoveUpDown(float AxisValue);
-
-	void HandleAxisBindings(const EAxis::Type AxisType, const float AxisValue);
+	void PitchShip(float AxisValue);
+	void RollShip(float AxisValue);
+	void ThrustShip(float AxisValue);
 
 	void MoveCameraLookHorizontal(float AxisValue);
 	void MoveCameraLookVertical(float AxisValue);
 
-	// Action bindings
-	void MoveUpButtonPressed();
-	void MoveDownButtonPressed();
-	void MoveRightButtonPressed();
-	void MoveLeftButtonPressed();
-	void MoveForwardButtonPressed();
-	void MoveBackwardButtonPressed();
-	void MoveUpButtonReleased();
-	void MoveDownButtonReleased();
-	void MoveRightButtonReleased();
-	void MoveLeftButtonReleased();
-	void MoveForwardButtonReleased();
-	void MoveBackwardButtonReleased();
-
 	// Ship-specific fields
-	UPROPERTY(EditAnywhere, Category = "SpaceshipStaticMeshComponent", meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USpaceshipStaticMeshComponent* SpaceshipStaticMeshComponent;
 
-	UPROPERTY(EditAnywhere, Category = "DamageThreshold", meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, Category = "Gameplay", BlueprintReadWrite)
 	int DamageThreshold = 300000;
+
+	UPROPERTY(EditAnywhere, Category = "Physics", BlueprintReadWrite)
+	float AngularDamping = 10.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Physics", BlueprintReadWrite)
+	float AngularAccelerationFactor = 1.0f / 16;
 
 public:	
 	// Called every frame
@@ -70,18 +60,7 @@ public:
 		const FHitResult& Hit);
 
 private:
-	const float ClampAxisValue(float AxisValue);
-
 	UCurveFloat* CurveFloat;
-
-	float UpThrustStartTime;
-	float DownThrustStartTime;
-	float RightThrustStartTime;
-	float LeftThrustStartTime;
-	float ForwardThrustStartTime;
-	float BackwardThrustStartTime;
-
-	FVector ResultantForceVector;
 
 	void ExplodeShip();
 };
