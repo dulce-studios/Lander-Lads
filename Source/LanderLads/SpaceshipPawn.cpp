@@ -1,6 +1,8 @@
 // Copyright 2019 Dulce Studios. All Rights Reserved.
 
 #include "SpaceshipPawn.h"
+
+#include "Engine/Engine.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Math/UnrealMathUtility.h"
 
@@ -38,6 +40,11 @@ void ASpaceshipPawn::BeginPlay()
 void ASpaceshipPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (GEngine) {
+		FString Velocity = FString::Printf(TEXT("Velocity: %f"), (this->SpaceshipStaticMeshComponent->GetComponentVelocity().Size()/100));
+		GEngine->AddOnScreenDebugMessage(0, 0.0f, FColor::Green, Velocity);
+	}
 }
 
 // Called to bind functionality to input
