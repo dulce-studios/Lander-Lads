@@ -94,6 +94,7 @@ void ASpaceshipPawn::ThrustShip(float AxisValue)
 	FRotator ShipWorldRotation = this->SpaceshipStaticMeshComponent->GetComponentRotation();
 	FVector ThrustVector = ShipWorldRotation.RotateVector(FVector(0.0f, 0.0f, Thrust));
 	this->SpaceshipStaticMeshComponent->AddForce(ThrustVector);
+	this->SpaceshipStaticMeshComponent->BumThrusterParticleSystemComponent->SetActive(AxisValue > 0.0f);
 
 	if (bAxisValueHasChanged)
 		PreviousTime = CurrentTime;
