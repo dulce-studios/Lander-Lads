@@ -131,8 +131,8 @@ void ASpaceshipPawn::OnCompHit(
 
 void ASpaceshipPawn::ExplodeShip()
 {
-	this->SpaceshipStaticMeshComponent->GetExplosionParticleSystemComponent()->SetRelativeScale3D(FVector(15));
+	this->SpaceshipStaticMeshComponent->ExplosionParticleSystemComponent->SetRelativeScale3D(FVector(15));
 	this->SpaceshipStaticMeshComponent->SetVisibility(false);
 	this->SpaceshipStaticMeshComponent->SetSimulatePhysics(false);
-	this->SpaceshipStaticMeshComponent->GetExplosionParticleSystemComponent()->SetActive(true);
+	this->SpaceshipStaticMeshComponent->ExplosionParticleSystemComponent->SetActive(true);
 }
