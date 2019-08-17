@@ -17,16 +17,27 @@ class LANDERLADS_API USpaceshipStaticMeshComponent : public UStaticMeshComponent
 public:
 	USpaceshipStaticMeshComponent();
 
-	UParticleSystemComponent* GetExplosionParticleSystemComponent();
-	UParticleSystemComponent* GetBumThrusterParticleSystemComponent();
+	void AttachThrusters(UParticleSystemComponent*& ParticleSystemComponent, const FName& ComponentName);
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,  BlueprintReadWrite)
 	USpringArmComponent* SpringArm;
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,  BlueprintReadWrite)
 	UParticleSystemComponent* ExplosionParticleSystemComponent;
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,  BlueprintReadWrite)
 	UParticleSystemComponent* BumThrusterParticleSystemComponent;
+
+	UPROPERTY(EditAnywhere,  BlueprintReadWrite)
+	UParticleSystemComponent* ForwardTiltThrusterParticleSystemComponent;
+
+	UPROPERTY(EditAnywhere,  BlueprintReadWrite)
+	UParticleSystemComponent* BackwardTiltThrusterParticleSystemComponent;
+
+	UPROPERTY(EditAnywhere,  BlueprintReadWrite)
+	UParticleSystemComponent* LeftTiltThrusterParticleSystemComponent;
+
+	UPROPERTY(EditAnywhere,  BlueprintReadWrite)
+	UParticleSystemComponent* RightTiltThrusterParticleSystemComponent;
 
 };
