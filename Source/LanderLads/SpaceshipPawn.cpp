@@ -3,8 +3,11 @@
 #include "SpaceshipPawn.h"
 
 #include "Engine/Engine.h"
-#include "UObject/ConstructorHelpers.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Math/UnrealMathUtility.h"
+#include "Public/CollisionQueryParams.h"
+#include "Public/DrawDebugHelpers.h"
+#include "UObject/ConstructorHelpers.h"
 
 // Sets default values
 ASpaceshipPawn::ASpaceshipPawn()
@@ -17,7 +20,6 @@ ASpaceshipPawn::ASpaceshipPawn()
 		
 	this->SpaceshipStaticMeshComponent = this->CreateDefaultSubobject<USpaceshipStaticMeshComponent>(
 		TEXT("SpaceshipStaticMeshComponent"));
-
 	this->SpaceshipStaticMeshComponent->AttachToComponent(
 		this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 
@@ -42,9 +44,14 @@ void ASpaceshipPawn::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (GEngine) {
-		FString Velocity = FString::Printf(TEXT("Velocity: %f"), (this->SpaceshipStaticMeshComponent->GetComponentVelocity().Size()/100));
-		GEngine->AddOnScreenDebugMessage(0, 0.0f, FColor::Green, Velocity);
+		FString Velocity = FString::Printf(TEXT("Velocity: %f m/s"), (this->SpaceshipStaticMeshComponent->GetComponentVelocity().Size()/100));
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Green, Velocity);
+
+		FString Altitude = FString::Printf(TEXT("Altitude: %f m"), (this->SpaceshipStaticMeshComponent->GetComponentLocation().Z)/100);
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Blue, Altitude);
 	}
+
+	this->RunProximityRadar();
 }
 
 // Called to bind functionality to input
@@ -63,6 +70,9 @@ void ASpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ASpaceshipPawn::PitchShip(float AxisValue)
 {
+	 this->SpaceshipStaticMeshComponent->ForwardTiltThrusterParticleSystemComponent->SetActive(AxisValue < 0.0f);
+	 this->SpaceshipStaticMeshComponent->BackwardTiltThrusterParticleSystemComponent->SetActive(AxisValue > 0.0f);
+
 	const float AngularMagnitude = PI * this->AngularAccelerationFactor;
 	const FVector LocalTorque(0, AxisValue * AngularMagnitude, 0);
 	const FVector Torque = this->GetControlRotation().RotateVector(LocalTorque);
@@ -71,6 +81,9 @@ void ASpaceshipPawn::PitchShip(float AxisValue)
 
 void ASpaceshipPawn::RollShip(float AxisValue)
 {
+	 this->SpaceshipStaticMeshComponent->LeftTiltThrusterParticleSystemComponent->SetActive(AxisValue < 0.0f);
+	 this->SpaceshipStaticMeshComponent->RightTiltThrusterParticleSystemComponent->SetActive(AxisValue > 0.0f);
+
 	const float AngularMagnitude = PI * this->AngularAccelerationFactor;
 	const FVector LocalTorque(AxisValue * AngularMagnitude, 0, 0);
 	const FVector Torque = this->GetControlRotation().RotateVector(LocalTorque);
@@ -135,4 +148,38 @@ void ASpaceshipPawn::ExplodeShip()
 	this->SpaceshipStaticMeshComponent->SetVisibility(false);
 	this->SpaceshipStaticMeshComponent->SetSimulatePhysics(false);
 	this->SpaceshipStaticMeshComponent->ExplosionParticleSystemComponent->SetActive(true);
+}
+
+void ASpaceshipPawn::RunProximityRadar()
+{
+	float ComponentRadius;
+	FVector Origin;
+	FVector BoxExtent;
+	UKismetSystemLibrary::GetComponentBounds(this->SpaceshipStaticMeshComponent, Origin, BoxExtent, ComponentRadius);
+
+	TArray<FHitResult> HitResults;
+
+	FVector SweepStart = this->SpaceshipStaticMeshComponent->GetComponentLocation();
+	FVector SweepEnd = this->SpaceshipStaticMeshComponent->GetComponentLocation();
+	SweepEnd.Z += 0.1f;
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery1);
+
+	TArray<AActor*> ActorsToIgnore;
+
+	UKismetSystemLibrary::SphereTraceMultiForObjects(
+		this->SpaceshipStaticMeshComponent,
+		SweepStart,
+		SweepEnd,
+		ComponentRadius * this->ProximityRadarRadiusMultiplier,
+		ObjectTypes,
+		true,
+		ActorsToIgnore,
+		EDrawDebugTrace::ForOneFrame,
+		HitResults,
+		true,
+		FLinearColor::Red,
+		FLinearColor::Green,
+		5.0);
 }

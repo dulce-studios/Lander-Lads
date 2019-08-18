@@ -40,6 +40,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Gameplay", BlueprintReadWrite)
 	int DamageThreshold = 300000;
+	
+	UPROPERTY(EditAnywhere, Category = "Gameplay", BlueprintReadWrite)
+	int ProximityRadarRadiusMultiplier = 2;
 
 	UPROPERTY(EditAnywhere, Category = "Physics", BlueprintReadWrite)
 	float AngularDamping = 10.0f;
@@ -63,4 +66,5 @@ private:
 	UCurveFloat* CurveFloat;
 
 	void ExplodeShip();
+	void RunProximityRadar();
 };
